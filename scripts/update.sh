@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -e
+set -xeuo pipefail
 
-version=`curl --silent "https://api.github.com/repos/ducaale/xh/releases/latest" | jq .tag_name | xargs`
-revision=`curl --silent "https://api.github.com/repos/ducaale/xh/commits/${version}" | jq .sha | xargs`
+version=$(curl --silent "https://api.github.com/repos/ducaale/xh/releases/latest" | jq -e .tag_name | xargs)
+revision=$(curl --silent "https://api.github.com/repos/ducaale/xh/commits/${version}" | jq -e .sha | xargs)
 version=${version#"v"}
 echo "latest stable version: ${version}, revision: ${revision}"
 
@@ -15,10 +15,8 @@ sed -ri \
 git add stable/Dockerfile
 git diff-index --quiet HEAD || git commit --message "updated stable to version ${version}, revision: ${revision}"
 
-set -e
-
 version="master"
-revision=`curl --silent "https://api.github.com/repos/ducaale/xh/commits/${version}" | jq .sha | xargs`
+revision=$(curl --silent "https://api.github.com/repos/ducaale/xh/commits/${version}" | jq -e .sha | xargs)
 echo "latest edge version: ${version}, revision: ${revision}"
 
 sed -ri \
