@@ -1,15 +1,22 @@
 ARG VERSION="master"
 ARG REVISION="555b318b6161b595c2234c54e9b7a17f761697c0"
 
-FROM ghcr.io/westonsteimel/rust-static-builder:stable as builder
+FROM docker.io/rust:alpine as builder
 
 ARG VERSION
 ARG REVISION
 
+RUN apk update && apk add --no-cache \
+    git \
+    ca-certificates \
+    build-base \
+    musl-utils \
+    musl-dev
+
 RUN git clone --branch "${VERSION}" https://github.com/ducaale/xh /build/xh \
     && cd /build/xh \
     && git reset --hard "${REVISION}" \
-    && NOCOMPRESS=1 /home/builder/build.sh
+    && RUSTFLAGS='-C link-arg=-s' cargo build --release --bins --target-dir /build/
 
 FROM alpine:latest as config
 
@@ -25,7 +32,7 @@ ENV XH_VERSION="${VERSION}" \
     TERM="xterm-256color"
 
 COPY --from=config /etc/passwd /etc/passwd
-COPY --from=builder /build/artifacts/xh /usr/local/bin/xh
+COPY --from=builder /build/release/xh /usr/local/bin/xh
 
 USER xh
 
