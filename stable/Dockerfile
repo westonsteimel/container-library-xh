@@ -18,11 +18,13 @@ RUN apk update && apk add --no-cache \
     musl-utils \
     musl-dev
 
+RUN cargo install cargo-auditable
+
 RUN git clone --branch "${XH_BRANCH}" "${XH_REPOSITORY}" /build/xh \
     && export ARCHITECTURE=$(arch) \
     && cd /build/xh \
     && git reset --hard "${XH_COMMIT}" \
-    && RUSTFLAGS='-C link-arg=-s -C link-arg=-specs=/build/package-metadata.spec' cargo build --release --bins --target-dir /build/
+    && RUSTFLAGS='-C link-arg=-s -C link-arg=-specs=/build/package-metadata.spec' cargo auditable build --release --bins --target-dir /build/
 
 FROM alpine:latest as config
 
