@@ -1,7 +1,7 @@
 ARG XH_REPOSITORY="https://github.com/ducaale/xh"
 ARG XH_VERSION="edge"
 ARG XH_BRANCH="master"
-ARG XH_COMMIT="8a575d3cf1131bb0fd645d672617a539a4ef8091"
+ARG XH_COMMIT="a804fed8032de9e060d09fe82ba807853ab72f70"
 
 FROM docker.io/rust:alpine as builder
 COPY package-metadata.spec /build/
